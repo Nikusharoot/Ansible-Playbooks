@@ -1,0 +1,25 @@
+Name: The name section is a human-readable description of what the playbook is doing.
+
+Hosts: The hosts section specifies the target hosts or groups of hosts that the playbook will be executed against.
+
+Become: The become section tells Ansible to run the playbook with administrative privileges. This is necessary for many tasks that require root access to the target host.
+
+Vars: The vars section defines variables that will be used throughout the playbook. These can be used to simplify the playbook, make it more reusable, and make it easier to maintain.
+
+Tasks: The tasks section is where the actual work of the playbook is defined. Each task describes a specific action to be performed on the target hosts.
+
+Each task is made up of several components:
+
+Name: The name section is a human-readable description of what the task is doing.
+
+Variables: The vars section defines any task-specific variables that will be used in the task.
+
+Conditions: The when section defines a condition that must be true in order for the task to be executed.
+
+Action: The action section defines the actual work to be performed on the target hosts. This can be a module, a command, or a script.
+
+Handlers: The handlers section defines handlers that will be triggered when specific events occur. Handlers are typically used to restart services or perform other cleanup tasks.
+
+Tags: The tags section allows tasks to be tagged with keywords that can be used to selectively run or skip tasks in the playbook.
+
+Notify: The notify section defines a handler to be triggered when the task completes successfully.
