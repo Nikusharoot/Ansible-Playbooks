@@ -1,0 +1,106 @@
+---
+- name: Deploy Python Application
+  hosts: webserver
+  become: yes
+  vars:
+    app_name: myapp
+    app_dir: /var/www/{{ app_name }}
+    app_user: myappuser
+    app_group: myappgroup
+    db_name: myappdb
+    db_user: myappdbuser
+    db_pass: secretpassword
+    domain_name: example.com
+    email_address: admin@example.com
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - python3-pip
+          - python3-dev
+          - nginx
+          - supervisor
+        state: present
+
+    - name: Install virtualenv
+      pip:
+        name: virtualenv
+        state: present
+
+    - name: Create virtual environment
+      virtualenv:
+        dest: "{{ app_dir }}/venv"
+        python: python3
+        system_site_packages: no
+
+    - name: Copy application code
+      copy:
+        src: app/
+        dest: "{{ app_dir }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: 0644
+
+    - name: Install Python requirements
+      pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        virtualenv: "{{ app_dir }}/venv"
+        state: present
+
+    - name: Configure Nginx
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/sites-available/{{ domain_name }}
+      notify:
+        - Restart Nginx
+
+    - name: Enable Nginx site
+      file:
+        src: "/etc/nginx/sites-available/{{ domain_name }}"
+        dest: "/etc/nginx/sites-enabled/{{ domain_name }}"
+        state: link
+
+    - name: Configure Supervisor
+      template:
+        src: templates/supervisor.conf.j2
+        dest: /etc/supervisor/conf.d/{{ app_name }}.conf
+      notify:
+        - Restart Supervisor
+
+    - name: Configure application settings
+      template:
+        src: templates/app_settings.j2
+        dest: "{{ app_dir }}/config.py"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: 0640
+
+    - name: Create PostgreSQL database
+      postgresql_db:
+        name: "{{ db_name }}"
+        login_user: postgres
+        login_password: secretpassword
+        state: present
+
+    - name: Create PostgreSQL user
+      postgresql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_pass }}"
+        db: "{{ db_name }}"
+        login_user: postgres
+        login_password: secretpassword
+        state: present
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Restart Supervisor
+      service:
+        name: supervisor
+        state: restarted
