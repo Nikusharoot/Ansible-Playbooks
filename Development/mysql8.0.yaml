@@ -1,0 +1,47 @@
+- name: Install MySQL Server
+  hosts: web-servers
+  become: yes
+
+  vars:
+    mysql_repo_url: "http://repo.mysql.com/mysql-apt-config_0.8.16-1_all.deb"
+    mysql_repo_checksum: "sha256:d3db54974b03dd7ea87313c2e0bdb36ddfaffea39f2043586130cb32f4c5d637"
+    mysql_root_password: "123321"
+
+  tasks:
+    - name: Download MySQL repository
+      get_url:
+        url: "{{ mysql_repo_url }}"
+        dest: "/tmp/mysql-apt-config.deb"
+        checksum: "{{ mysql_repo_checksum }}"
+        mode: 0644
+
+    - name: Install MySQL repository
+      apt:
+        deb: "/tmp/mysql-apt-config.deb"
+        update_cache: yes
+
+    - name: Install MySQL Server
+      apt:
+        name:
+          - mysql-server
+
+    - name: Configure MySQL root password
+      debconf:
+        name: mysql-server-8.0
+        question: "mysql-server-8.0 mysql-server/root_password password {{ mysql_root_password }}"
+        vtype: password
+        value: "{{ mysql_root_password }}"
+      notify: Restart MySQL Service
+
+    - name: Confirm MySQL root password
+      debconf:
+        name: mysql-server-8.0
+        question: "mysql-server-8.0 mysql-server/root_password_again password {{ mysql_root_password }}"
+        value: "{{ mysql_root_password }}"
+        vtype: password
+
+  handlers:
+    - name: Restart MySQL Service
+      service:
+        name: mysql
+        state: restarted
