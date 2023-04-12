@@ -1,0 +1,36 @@
+---
+- name: Launch EC2 Instance
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    region: "{{ lookup('env', 'AWS_REGION') }}"
+    image_id: "ami-0c55b159cbfafe1f0" # Amazon Linux 2 AMI (HVM), SSD Volume Type
+    instance_type: "t2.micro"
+    security_group: "default"
+    subnet_id: "{{ lookup('env', 'AWS_SUBNET_ID') }}"
+    key_name: "{{ lookup('env', 'AWS_KEY_NAME') }}"
+    count: 1
+
+  tasks:
+    - name: Launch EC2 Instance
+      ec2:
+        region: "{{ region }}"
+        image: "{{ image_id }}"
+        instance_type: "{{ instance_type }}"
+        security_group: "{{ security_group }}"
+        subnet_id: "{{ subnet_id }}"
+        key_name: "{{ key_name }}"
+        count: "{{ count }}"
+        wait: true
+        assign_public_ip: true
+        instance_tags:
+          Name: my-ec2-instance
+      register: ec2_instance
+
+    - name: Add instance to host group
+      add_host:
+        name: "{{ item.public_ip }}"
+        groups: ec2_instances
+      with_items: "{{ ec2_instance.instances }}"
