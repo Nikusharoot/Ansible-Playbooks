@@ -1,0 +1,73 @@
+---
+- hosts: ec2-instance
+  become: true
+  vars:
+    k8s_version: "1.22.4-0"
+    app_name: "my-app"
+    app_image_name: "my-ecr-repo:latest"
+    app_container_port: 5000
+    app_replicas: 2
+    ingress_host: "my-app.example.com"
+    ingress_tls_secret: "my-app-tls"
+  
+  tasks:
+  - name: Install Kubernetes packages
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    with_items:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+  - name: Add Kubernetes apt key
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+  - name: Add Kubernetes apt repository
+    apt_repository:
+      repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
+      filename: kubernetes.list
+      update_cache: yes
+      keyserver: keyserver.ubuntu.com
+      key_id: 6A030B21BA07F4FB
+  - name: Install Kubernetes tools
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    with_items:
+      - kubelet={{ k8s_version }}
+      - kubeadm={{ k8s_version }}
+      - kubectl={{ k8s_version }}
+  - name: Disable swap
+    command: swapoff -a
+    when: ansible_swaptotal_mb > 0
+  - name: Initialize Kubernetes cluster
+    command: kubeadm init --pod-network-cidr=10.244.0.0/16
+    args:
+      creates: /etc/kubernetes/admin.conf
+    register: kubeadm_init_output
+    become: false
+  - name: Save Kubernetes config file
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: ~/.kube/config
+      remote_src: true
+    become: false
+  - name: Install Flannel network plugin
+    command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+    become: false
+  - name: Deploy Python app to Kubernetes
+    k8s:
+      state: present
+      src: "{{ playbook_dir }}/k8s/{{ app_name }}.yaml"
+      namespace: default
+  - name: Create Ingress for Python app
+    k8s:
+      state: present
+      src: "{{ playbook_dir }}/k8s/{{ app_name }}-ingress.yaml"
+      namespace: default
