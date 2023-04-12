@@ -1,8 +1,14 @@
 Tools დირექტორიაში აიტვირთება სხვადასხვა ხელსაწყო, საინტერესო ფაილები, დოკუმენტაცია, სატესტო ფაილები
 
 
-1. ერთი
-2. ორი
-3. სამი
-4. ოთხი
-5. ხუთი
+Ansible Tower: Ansible Tower is a web-based UI and automation platform that provides a graphical interface for managing Ansible playbooks, inventory, and credentials. It also provides advanced features such as job scheduling, workflow automation, and role-based access control.
+
+Ansible Galaxy: Ansible Galaxy is a hub for finding, reusing, and sharing Ansible content. It provides a collection of pre-built roles, modules, and playbooks that can be easily downloaded and integrated into your Ansible automation workflows.
+
+Molecule: Molecule is a tool that helps with testing and validating Ansible roles on multiple platforms and with different configurations. It automates the process of spinning up test instances, applying roles, and running tests, making it easy to ensure the quality and reliability of Ansible code.
+
+Ansible lint: Ansible-lint is a tool that analyzes Ansible playbooks and roles for potential problems and best practices. It can help catch syntax errors, identify unused variables, enforce coding standards, and make playbooks more maintainable and reliable.
+
+AWX: AWX is a community-driven open-source version of Ansible Tower, which can be installed on-premises or in the cloud. It provides a similar set of features as Ansible Tower, including a web-based UI, job scheduling, and role-based access control, but without the licensing fees.
+
+Ansible-cmdb: Ansible-cmdb is a tool that generates inventory and configuration reports for Ansible-managed systems. It can collect information about the hosts and the installed software, and generate static HTML reports that can be easily shared and used for documentation purposes.
