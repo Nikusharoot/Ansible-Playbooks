@@ -1,0 +1,30 @@
+---
+- name: Manage Docker Container
+  hosts: docker-host
+  become: true
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+    - name: Start Docker Service
+      service:
+        name: docker
+        state: started
+    - name: Pull Docker Image
+      docker_image:
+        name: nginx:latest
+        source: pull
+    - name: Create Docker Network
+      docker_network:
+        name: my-network
+        state: present
+    - name: Start Docker Container
+      docker_container:
+        name: my-nginx
+        image: nginx:latest
+        ports:
+          - "80:80"
+        networks:
+          - name: my-network
+        state: started
