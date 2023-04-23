@@ -7,7 +7,6 @@ CHATGPT-ს მიერ შექმნილი Playbook-ები და ბ�
 Ansible Installation
 Ansible is an open source automation platform. It is very, very simple to setup and yet powerful. Ansible can help you with configuration management, application deployment, task automation.
 
-Follow this in **YouTube
 Prerequisites
 An AWS EC2 instance
 Installation steps:
