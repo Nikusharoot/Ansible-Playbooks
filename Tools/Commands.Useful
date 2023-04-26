@@ -1,6 +1,31 @@
 Identify the OS distribution_version of the localhost using ansible facts - ansible -m setup localhost | grep distribution_version
+---------
 Identify the OS distribution of the web1 host using ansible fact - ansible -i inventory -m setup web1 | grep distribution
+---------
 Retrieve facts and store it to location -  ansible -m setup web1 -i inventory > /home/thor/playbooks/web/web-facts.txt
+---------
 Defautlt Ansible config view - ansible-config view
+---------
 Install Ansible package using yum on ansible controller - sudo yum install epel-release -y ; sudo yum install ansible -y
+---------
 default log path - grep -ir log_path /etc/ansible/ansible.cfg
+---------
+logging for ansible debbuging bellow 
+cat <<EOF  > /home/thor/playbooks/ansible.cfg
+log_path = /var/log/ansible/ansible.log
+EOF
+---------
+Ansible controller node generate an SSH key with filename ansible - ssh-keygen -t rsa -f ~/.ssh/ansible
+----------
+Run the Ansible command to display the version and save the output to a file - ansible --version > /tmp/ansible_version.txt
+----------
+ansible command to gather facts of the localhost and save the output - ansible -m setup localhost > /tmp/ansible_facts.txt
+-------------
+ ad-hoc command to perform a ping connectivity test for the localhost - ansible -m ping localhost > /tmp/ansible_ping.txt
+ --------
+ check connectivity to all hosts and save to file - ansible -m ping -i /home/thor/playbooks/inventory all > /tmp/ansible_all.txt
+ --------------
+ კონფიგში ცვლილების შეტანა ფაილის გახსნის გარეშე sed-ის გამოყენებით - sed -i 's/^become=True/become=False/' /etc/ansible/ansible.cfg
+--------------
+კონრეტული ხაზის ძიება Grep-ის საშუალებით  -  grep -w "become" /etc/ansible/ansible.cfg 
+-------------
