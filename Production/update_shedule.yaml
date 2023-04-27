@@ -1,0 +1,17 @@
+---
+- name: Configure yum update cron job
+  hosts: node00
+  become: true
+  tasks:
+    - name: Create yum update cron file
+      copy:
+        dest: /etc/cron.d/ansible_yum
+        content: |
+          5 8 * * 0 root yum -y update
+        mode: '0644'
+      notify:
+        - Reload cron
+
+  handlers:
+    - name: Reload cron
+      command: cron reload
