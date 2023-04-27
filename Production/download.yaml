@@ -1,0 +1,8 @@
+---
+- name: Download and extract from URL
+  hosts: web1
+  tasks:
+  -   unarchive:
+       src: https://github.com/Nikusharoot/Maven_APP/archive/refs/heads/main.zip
+       dest: /opt
+       remote_src: yes
